@@ -1,6 +1,5 @@
 {
   "name": "Design Critique Assistant",
-  "id": "design-critique-assistant",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
@@ -13,4 +12,4 @@
   "enableProposedApi": false,
   "enablePrivatePluginApi": false,
   "documentAccess": "dynamic-page"
-} 
+}
