@@ -81,26 +81,37 @@ The AI provides feedback on:
 - **User Experience** - Usability and interaction patterns
 - **Brand Consistency** - Alignment with design systems
 
-## 🔧 Development
+## 🔧 Technical Details
+
+### Configuration
+
+- **Model**: GPT-3.5-turbo
+- **Max Tokens**: 1000
+- **Temperature**: 0.7
+- **UI Dimensions**: 400x600px
+- **Max Elements**: 1000 per analysis
+
+### Security
+
+- API keys stored in `sessionStorage` (cleared when browser closes)
+- No data stored permanently
+- All API communication encrypted via HTTPS
+- Comprehensive input validation and error handling
 
 ### Project Structure
 
 ```
-├── manifest.json          # Figma plugin manifest
-├── code.js               # Plugin backend logic
-├── ui.html               # Plugin UI interface
-├── README.md             # Documentation
-└── LICENSE               # MIT License
+├── manifest.json    # Figma plugin manifest
+├── code.js         # Plugin backend logic
+├── ui.html         # Plugin UI interface
+├── icon.svg        # Plugin icon
+├── README.md       # Documentation
+└── LICENSE         # MIT License
 ```
 
-### Built With
+## 🛠️ Development
 
-- **Figma Plugin API** - Core plugin functionality
-- **OpenAI GPT-3.5-turbo** - AI-powered design analysis
-- **Vanilla JavaScript** - Lightweight, fast performance
-- **Modern CSS** - Responsive, accessible UI
-
-### Local Development
+### Local Setup
 
 1. Clone the repository
    ```bash
@@ -117,6 +128,13 @@ The AI provides feedback on:
    - Make changes to `code.js` or `ui.html`
    - Reload the plugin in Figma to see changes
 
+### Built With
+
+- **Figma Plugin API** - Core plugin functionality
+- **OpenAI GPT-3.5-turbo** - AI-powered design analysis
+- **Vanilla JavaScript** - Lightweight, fast performance
+- **Modern CSS** - Responsive, accessible UI
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -126,9 +144,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 📄 License
-
 
 ## 💬 Support
 
@@ -140,126 +155,14 @@ If you have any questions or need help:
 ## 🙏 Acknowledgments
 
 - OpenAI for providing the GPT-3.5-turbo API
-- Figma team for the excellent Plugin API
 - The design community for inspiration and feedback
-
----
-
-**Made with ❤️ for the design community**
-
-# Design Critique Assistant - Figma Plugin
-
-A professional Figma plugin that provides AI-powered design critiques using OpenAI's GPT-3.5-turbo model.
-
-## 🚀 Features
-
-- **AI-Powered Design Analysis**: Get detailed critiques of your Figma designs
-- **Real-time Selection Analysis**: Automatically analyzes selected design elements
-- **Comprehensive Feedback**: Covers visual hierarchy, colors, typography, spacing, and accessibility
-- **Secure API Key Storage**: Stores your OpenAI API key securely in session storage
-- **Context-Aware Critiques**: Add custom context for more targeted feedback
-- **Professional UI**: Clean, modern interface with loading states and error handling
-
-## 📁 File Structure
-
-```
-figma-design-critique-plugin/
-├── code.js              # Main plugin logic (bundled)
-├── ui.html              # Plugin UI (bundled)
-├── manifest.json        # Plugin configuration
-├── README.md           # This file
-└── IMPROVEMENTS_SUMMARY.md  # Development improvements log
-```
-
-## 🛠️ Installation
-
-1. **Get OpenAI API Key**:
-   - Visit [OpenAI API](https://platform.openai.com/api-keys)
-   - Create a new API key
-   - Copy the key (starts with `sk-`)
-
-2. **Install Plugin in Figma**:
-   - Open Figma
-   - Go to **Plugins** → **Development** → **Import plugin from manifest**
-   - Select the `manifest.json` file from this folder
-
-3. **Use the Plugin**:
-   - Select design elements in Figma
-   - Run the plugin from **Plugins** → **Design Critique Assistant**
-   - Enter your OpenAI API key
-   - Click "Get Design Critique"
-
-## 🎯 How It Works
-
-1. **Selection Analysis**: The plugin analyzes your selected Figma elements
-2. **Data Extraction**: Extracts colors, fonts, dimensions, and element types
-3. **AI Processing**: Sends structured data to OpenAI GPT-3.5-turbo
-4. **Professional Critique**: Returns formatted, actionable design feedback
-
-## 🔧 Configuration
-
-The plugin uses these default settings:
-
-- **Model**: GPT-3.5-turbo
-- **Max Tokens**: 1000
-- **Temperature**: 0.7
-- **UI Dimensions**: 400x600px
-- **Max Elements**: 1000 per analysis
-
-## 🛡️ Security
-
-- API keys are stored in `sessionStorage` (cleared when browser closes)
-- No data is stored permanently
-- All API communication is encrypted via HTTPS
-
-## 📝 Error Handling
-
-The plugin includes comprehensive error handling for:
-- Invalid API keys
-- Network connectivity issues
-- Empty selections
-- API rate limits
-- Malformed responses
-
-## 🎨 UI Features
-
-- **Real-time Selection Updates**: Shows element count, types, colors, and fonts
-- **Loading States**: Visual feedback during API requests
-- **Error Messages**: Clear, actionable error messages
-- **Navigation**: Easy switching between main and critique views
-- **Responsive Design**: Optimized for Figma's plugin window
-
-## 🔄 Development
-
-This plugin was refactored from a monolithic structure to a modern, modular architecture with:
-
-- **ES5 Compatibility**: Works with Figma's plugin system
-- **Error Handling**: Comprehensive error management
-- **Performance**: Optimized data extraction and caching
-- **Security**: Secure API key storage
-- **Code Quality**: Clean, maintainable code structure
 
 ## 📄 License
 
 MIT License - see LICENSE file for details.
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly in Figma
-5. Submit a pull request
-
-## 📞 Support
-
-For issues or questions:
-1. Check the error messages in the plugin
-2. Verify your API key is correct
-3. Ensure you have selected design elements
-4. Check your internet connection
-
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: August 2024 
+**Version**: 1.0.0  
+**Last Updated**: August 2024  
+**Made with ❤️ for the design community**
