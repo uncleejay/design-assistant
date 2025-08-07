@@ -344,7 +344,7 @@
           placeholder="Enter your OpenAI API key"
         >
         <p style="font-size: 11px; color: #666; margin-top: 8px;">
-          Your API key is stored locally and never sent to our servers.
+          Get your free API key from <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #0066cc; text-decoration: none;">OpenAI Platform</a>.
         </p>
       </div>
 
@@ -439,7 +439,7 @@
 
     // Logger utility
     function Logger() {}
-    Logger.isDevelopment = false; // Set to false for production
+    Logger.isDevelopment = true; // Temporarily enabled for debugging
 
     Logger.info = function(message, data) {
       // Only log in development mode

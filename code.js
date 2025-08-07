@@ -55,7 +55,7 @@ var ERROR_CODES = {
 
 // Logger utility
 function Logger() {}
-Logger.isDevelopment = false; // Set to false for production
+Logger.isDevelopment = true; // Temporarily enabled for debugging
 
 Logger.info = function(message, data) {
   // Only log in development mode
