@@ -1,13 +1,13 @@
 # 🎨 Design Critique Assistant
 
-> Get AI-powered design feedback directly in Figma. Improve your designs with intelligent critiques from OpenAI's GPT-4.
+> Get AI-powered design feedback directly in Figma. Improve your designs with intelligent critiques from OpenAI's GPT-3.5-turbo.
 
 [![Figma Plugin](https://img.shields.io/badge/Figma-Plugin-00D2FF?logo=figma&logoColor=white)](https://figma.com)
 [![OpenAI](https://img.shields.io/badge/Powered%20by-OpenAI-412991?logo=openai)](https://openai.com)
 
 ## ✨ Features
 
-- 🤖 **AI-Powered Analysis** - Get intelligent design feedback using OpenAI's GPT-4
+- 🤖 **AI-Powered Analysis** - Get intelligent design feedback using OpenAI's GPT-3.5-turbo
 - 🎯 **Context-Aware** - Provide additional context for targeted critiques
 - 🔒 **Secure** - Your API keys are stored locally and never sent to our servers
 - ⚡ **Real-time** - Instant analysis of your selected design elements
@@ -96,7 +96,7 @@ The AI provides feedback on:
 ### Built With
 
 - **Figma Plugin API** - Core plugin functionality
-- **OpenAI GPT-4** - AI-powered design analysis
+- **OpenAI GPT-3.5-turbo** - AI-powered design analysis
 - **Vanilla JavaScript** - Lightweight, fast performance
 - **Modern CSS** - Responsive, accessible UI
 
@@ -139,7 +139,7 @@ If you have any questions or need help:
 
 ## 🙏 Acknowledgments
 
-- OpenAI for providing the GPT-4 API
+- OpenAI for providing the GPT-3.5-turbo API
 - Figma team for the excellent Plugin API
 - The design community for inspiration and feedback
 
