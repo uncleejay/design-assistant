@@ -1,0 +1,16 @@
+{
+  "name": "Design Critique Assistant",
+  "id": "design-critique-assistant",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma", "dev"],
+  "networkAccess": {
+    "allowedDomains": ["https://api.openai.com"]
+  },
+  "permissions": ["currentuser"],
+  "capabilities": ["inspect"],
+  "enableProposedApi": false,
+  "enablePrivatePluginApi": false,
+  "documentAccess": "dynamic-page"
+} 

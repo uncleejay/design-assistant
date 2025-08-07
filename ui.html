@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Design Critique Assistant</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Container and layout */
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Header styles */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    /* Content area */
+    .content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: visible;
+    }
+
+    /* Section components */
+    .section {
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Icons */
+    .icon {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Selection info */
+    .selection-info {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-left: 4px solid #667eea;
+    }
+
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .info-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-label {
+      font-weight: 500;
+      color: #666;
+    }
+
+    .info-value {
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* Form inputs */
+    .api-key-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 12px;
+      transition: border-color 0.2s;
+      background: white;
+    }
+
+    .api-key-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .context-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 12px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      background: white;
+    }
+
+    .context-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #666;
+      border: 1px solid #e1e5e9;
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+    }
+
+    /* Loading states */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Results and errors */
+    .critique-result {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      border-left: 4px solid #28a745;
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #333;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      font-size: 12px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 16px 20px;
+      background: #f8f9fa;
+      border-top: 1px solid #e1e5e9;
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* Navigation */
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 1001;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .back-btn:active {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .back-icon {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
+
+    /* Page-specific content heights */
+    #critiquePage .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    #mainPage .content {
+      flex: 1;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Page -->
+  <div id="mainPage" class="container">
+    <div class="header">
+      <h1>🎨 Design Critique Assistant</h1>
+      <p>Get AI-powered feedback on your designs</p>
+    </div>
+
+    <div class="content">
+      <div class="section">
+        <h3>
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          Current Selection
+        </h3>
+        <div id="selectionInfo" class="selection-info">
+          <div class="info-item">
+            <span class="info-label">Elements:</span>
+            <span class="info-value" id="elementCount">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Types:</span>
+            <span class="info-value" id="elementTypes">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Colors:</span>
+            <span class="info-value" id="elementColors">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Fonts:</span>
+            <span class="info-value" id="elementFonts">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          API Configuration
+        </h3>
+        <input 
+          type="password" 
+          id="apiKeyInput" 
+          class="api-key-input" 
+          placeholder="Enter your OpenAI API key"
+        >
+        <p style="font-size: 11px; color: #666; margin-top: 8px;">
+          Your API key is stored locally and never sent to our servers.
+        </p>
+      </div>
+
+      <div class="section">
+        <h3>
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+          Additional Context
+        </h3>
+        <textarea 
+          id="contextInput" 
+          class="context-input" 
+          placeholder="Describe what you're working on, target audience, or specific concerns you'd like feedback on..."
+        ></textarea>
+      </div>
+
+      <div class="section">
+        <button id="getCritiqueBtn" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          Get Design Critique
+        </button>
+      </div>
+
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Analyzing your design...</p>
+      </div>
+
+      <div id="critiqueResult" style="display: none;"></div>
+      <div id="errorMessage" style="display: none;"></div>
+    </div>
+
+    <div class="footer">
+      <p>Powered by OpenAI GPT-4 • Design Critique Assistant v1.0</p>
+    </div>
+  </div>
+
+  <!-- Critique Results Page -->
+  <div id="critiquePage" class="container" style="display: none;">
+    <div class="header">
+      <button class="back-btn" id="backBtn" title="Back to main">
+        <svg class="back-icon" viewBox="0 0 24 24">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+      </button>
+      <h1>🎨 Design Critique Results</h1>
+      <p>AI-powered feedback on your design</p>
+    </div>
+
+    <div class="content">
+      <div class="section">
+        <h3>
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+          Design Critique
+        </h3>
+        <div id="critiqueContent" class="critique-result">
+          <!-- Critique content will be populated here -->
+        </div>
+      </div>
+
+      <div class="section">
+        <button id="newCritiqueBtn" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          Get New Critique
+        </button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Powered by OpenAI GPT-4 • Design Critique Assistant v1.0</p>
+    </div>
+  </div>
+
+  <script>
+    // =============================================================================
+    // UI MANAGER - BUNDLED VERSION
+    // =============================================================================
+
+    // Configuration
+    var CONFIG = {
+      STORAGE: {
+        API_KEY_KEY: 'figma-critique-api-key'
+      }
+    };
+
+    // Logger utility
+    function Logger() {}
+    Logger.isDevelopment = false; // Set to false for production
+
+    Logger.info = function(message, data) {
+      // Only log in development mode
+      if (Logger.isDevelopment) {
+        console.log('[INFO] ' + message);
+      }
+    };
+
+    Logger.error = function(message, error) {
+      // Always log errors
+      console.error('[ERROR] ' + message);
+    };
+
+    Logger.debug = function(message, data) {
+      // Only log debug info in development
+      if (Logger.isDevelopment) {
+        console.log('[DEBUG] ' + message);
+      }
+    };
+
+    Logger.warn = function(message, data) {
+      // Always log warnings
+      console.warn('[WARN] ' + message);
+    };
+
+    // Secure storage utility
+    function SecureStorage() {}
+
+    SecureStorage.setApiKey = function(apiKey) {
+      try {
+        // Try localStorage first, fallback to sessionStorage
+        if (typeof localStorage !== 'undefined' && localStorage.setItem) {
+          localStorage.setItem('figma-critique-api-key', apiKey);
+        } else if (typeof sessionStorage !== 'undefined' && sessionStorage.setItem) {
+          sessionStorage.setItem('figma-critique-api-key', apiKey);
+        }
+        Logger.debug('API key stored successfully');
+      } catch (error) {
+        Logger.error('Failed to store API key', error);
+        // Don't throw error, just log it
+        console.warn('Could not store API key, but continuing...');
+      }
+    };
+
+    SecureStorage.getApiKey = function() {
+      try {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem) {
+          return localStorage.getItem('figma-critique-api-key');
+        } else if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem) {
+          return sessionStorage.getItem('figma-critique-api-key');
+        }
+        return null;
+      } catch (error) {
+        Logger.error('Failed to retrieve API key', error);
+        return null;
+      }
+    };
+
+    SecureStorage.clearApiKey = function() {
+      try {
+        if (typeof localStorage !== 'undefined' && localStorage.removeItem) {
+          localStorage.removeItem('figma-critique-api-key');
+        } else if (typeof sessionStorage !== 'undefined' && sessionStorage.removeItem) {
+          sessionStorage.removeItem('figma-critique-api-key');
+        }
+        Logger.debug('API key cleared successfully');
+      } catch (error) {
+        Logger.error('Failed to clear API key', error);
+      }
+    };
+
+    SecureStorage.hasApiKey = function() {
+      return SecureStorage.getApiKey() !== null;
+    };
+
+    // UI Manager
+    function UIManager() {
+      this.currentDesignInfo = null;
+      this.currentPage = 'main';
+      this.elements = {};
+      this.isInitialized = false;
+    }
+
+    UIManager.prototype.initialize = function() {
+      try {
+        Logger.info('Initializing UI Manager');
+        
+        this._cacheElements();
+        this._loadSavedData();
+        this._setupEventListeners();
+        this._setupMessageHandler();
+        
+        this.isInitialized = true;
+        Logger.info('UI Manager initialized successfully');
+        
+      } catch (error) {
+        Logger.error('Failed to initialize UI Manager', error);
+        throw error;
+      }
+    };
+
+    UIManager.prototype._cacheElements = function() {
+      this.elements = {
+        // Main page elements
+        mainPage: document.getElementById('mainPage'),
+        apiKeyInput: document.getElementById('apiKeyInput'),
+        contextInput: document.getElementById('contextInput'),
+        getCritiqueBtn: document.getElementById('getCritiqueBtn'),
+        loading: document.getElementById('loading'),
+        critiqueResult: document.getElementById('critiqueResult'),
+        errorMessage: document.getElementById('errorMessage'),
+        
+        // Selection info elements
+        elementCount: document.getElementById('elementCount'),
+        elementTypes: document.getElementById('elementTypes'),
+        elementColors: document.getElementById('elementColors'),
+        elementFonts: document.getElementById('elementFonts'),
+        
+        // Critique page elements
+        critiquePage: document.getElementById('critiquePage'),
+        backBtn: document.getElementById('backBtn'),
+        newCritiqueBtn: document.getElementById('newCritiqueBtn'),
+        critiqueContent: document.getElementById('critiqueContent')
+      };
+      
+      Logger.debug('DOM elements cached', Object.keys(this.elements));
+    };
+
+    UIManager.prototype._loadSavedData = function() {
+      try {
+        var savedApiKey = SecureStorage.getApiKey();
+        if (savedApiKey && this.elements.apiKeyInput) {
+          this.elements.apiKeyInput.value = savedApiKey;
+          Logger.debug('Loaded saved API key');
+        }
+      } catch (error) {
+        Logger.error('Failed to load saved data', error);
+      }
+    };
+
+    UIManager.prototype._setupEventListeners = function() {
+      try {
+        var self = this;
+        
+        // API key input
+        if (this.elements.apiKeyInput) {
+          this.elements.apiKeyInput.addEventListener('input', function() {
+            self._handleApiKeyChange();
+          });
+        }
+
+        // Get critique button
+        if (this.elements.getCritiqueBtn) {
+          this.elements.getCritiqueBtn.addEventListener('click', function() {
+            self._handleGetCritique();
+          });
+        }
+
+        // Navigation buttons
+        if (this.elements.backBtn) {
+          this.elements.backBtn.addEventListener('click', function() {
+            self._handleBack();
+          });
+        }
+
+        if (this.elements.newCritiqueBtn) {
+          this.elements.newCritiqueBtn.addEventListener('click', function() {
+            self._handleBack();
+          });
+        }
+
+        Logger.debug('Event listeners attached');
+        
+      } catch (error) {
+        Logger.error('Failed to setup event listeners', error);
+      }
+    };
+
+    UIManager.prototype._setupMessageHandler = function() {
+      var self = this;
+      window.onmessage = function(event) {
+        var message = event.data.pluginMessage;
+        
+        if (!message) return;
+        
+        try {
+          self._handlePluginMessage(message);
+        } catch (error) {
+          Logger.error('Error handling plugin message', error);
+          self.showError('Failed to process plugin message');
+        }
+      };
+    };
+
+    UIManager.prototype._handlePluginMessage = function(message) {
+      try {
+        Logger.debug('Received plugin message', { type: message.type });
+        
+        if (!message || !message.type) {
+          Logger.warn('Invalid message received', message);
+          return;
+        }
+        
+        switch (message.type) {
+          case 'plugin-loaded':
+            this.updateSelectionInfo(message.data);
+            break;
+            
+          case 'selection-updated':
+            this.updateSelectionInfo(message.data);
+            break;
+            
+          case 'critique-received':
+            this.showCritique(message.data);
+            break;
+            
+          case 'error':
+            this.showError(message.data);
+            break;
+            
+          case 'make-api-request':
+            this._handleApiRequest(message);
+            break;
+            
+          default:
+            Logger.warn('Unknown message type', { type: message.type });
+        }
+      } catch (error) {
+        Logger.error('Error handling plugin message', error);
+        this.showError('Failed to process message: ' + error.message);
+      }
+    };
+
+    UIManager.prototype._handleApiKeyChange = function() {
+      try {
+        var apiKey = this.elements.apiKeyInput.value;
+        SecureStorage.setApiKey(apiKey);
+        Logger.debug('API key updated');
+      } catch (error) {
+        Logger.error('Failed to save API key', error);
+        // Don't show error to user, just log it
+        console.warn('API key storage failed, but continuing...');
+      }
+    };
+
+    UIManager.prototype._handleGetCritique = function() {
+      try {
+        var apiKey = this.elements.apiKeyInput.value.trim();
+        var context = this.elements.contextInput.value.trim();
+
+        Logger.debug('Get critique request', {
+          hasApiKey: !!apiKey,
+          hasContext: !!context,
+          hasDesignInfo: !!this.currentDesignInfo
+        });
+
+        if (!apiKey) {
+          this.showError('Please enter your OpenAI API key');
+          return;
+        }
+
+        if (!this.currentDesignInfo || this.currentDesignInfo.count === 0) {
+          this.showError('Please select some design elements first');
+          return;
+        }
+
+        this._showLoading();
+
+        // Send request to plugin
+        parent.postMessage({
+          pluginMessage: {
+            type: 'get-critique',
+            designInfo: this.currentDesignInfo,
+            prompt: {
+              apiKey: apiKey,
+              context: context
+            }
+          }
+        }, '*');
+        
+        Logger.info('Critique request sent to plugin');
+        
+      } catch (error) {
+        Logger.error('Failed to send critique request', error);
+        this.showError('Failed to send request');
+      }
+    };
+
+    UIManager.prototype._handleBack = function() {
+      this._showMainPage();
+    };
+
+    UIManager.prototype.updateSelectionInfo = function(designInfo) {
+      try {
+        if (!designInfo) {
+          Logger.warn('No design info provided');
+          return;
+        }
+        
+        this.currentDesignInfo = designInfo;
+        
+        if (this.elements.elementCount) {
+          this.elements.elementCount.textContent = designInfo.count || 0;
+        }
+        
+        if (this.elements.elementTypes) {
+          this.elements.elementTypes.textContent = (designInfo.types && designInfo.types.join) ? 
+            designInfo.types.join(', ') || 'None' : 'None';
+        }
+        
+        if (this.elements.elementColors) {
+          this.elements.elementColors.textContent = (designInfo.colors && designInfo.colors.length > 0) ? 
+            designInfo.colors.length + ' colors' : 'None';
+        }
+        
+        if (this.elements.elementFonts) {
+          this.elements.elementFonts.textContent = (designInfo.fonts && designInfo.fonts.length > 0) ? 
+            designInfo.fonts.length + ' fonts' : 'None';
+        }
+        
+        Logger.debug('Selection info updated', { count: designInfo.count });
+        
+      } catch (error) {
+        Logger.error('Failed to update selection info', error);
+        this.showError('Failed to update selection info: ' + error.message);
+      }
+    };
+
+    UIManager.prototype.showCritique = function(critique) {
+      try {
+        this._hideLoading();
+        
+        // Format the critique response
+        var formattedCritique = this._formatCritiqueResponse(critique);
+        
+        // Populate critique content
+        if (this.elements.critiqueContent) {
+          this.elements.critiqueContent.innerHTML = formattedCritique;
+        }
+        
+        // Show critique page
+        this._showCritiquePage();
+        
+        Logger.info('Critique displayed', { length: critique.length });
+        
+      } catch (error) {
+        Logger.error('Failed to show critique', error);
+        this.showError('Failed to display critique');
+      }
+    };
+
+    UIManager.prototype.showError = function(message) {
+      try {
+        this._hideLoading();
+        
+        if (this.elements.errorMessage) {
+          this.elements.errorMessage.innerHTML = '<div class="error">' + message + '</div>';
+          this.elements.errorMessage.style.display = 'block';
+        }
+        
+        Logger.warn('Error displayed', { message: message });
+        
+      } catch (error) {
+        Logger.error('Failed to show error', error);
+      }
+    };
+
+    UIManager.prototype._showLoading = function() {
+      try {
+        if (this.elements.loading) {
+          this.elements.loading.style.display = 'block';
+        }
+        
+        if (this.elements.getCritiqueBtn) {
+          this.elements.getCritiqueBtn.disabled = true;
+        }
+        
+        if (this.elements.critiqueResult) {
+          this.elements.critiqueResult.style.display = 'none';
+        }
+        
+        if (this.elements.errorMessage) {
+          this.elements.errorMessage.style.display = 'none';
+        }
+        
+      } catch (error) {
+        Logger.error('Failed to show loading', error);
+      }
+    };
+
+    UIManager.prototype._hideLoading = function() {
+      try {
+        if (this.elements.loading) {
+          this.elements.loading.style.display = 'none';
+        }
+        
+        if (this.elements.getCritiqueBtn) {
+          this.elements.getCritiqueBtn.disabled = false;
+        }
+        
+      } catch (error) {
+        Logger.error('Failed to hide loading', error);
+      }
+    };
+
+    UIManager.prototype._showMainPage = function() {
+      try {
+        if (this.elements.critiquePage) {
+          this.elements.critiquePage.style.display = 'none';
+        }
+        
+        if (this.elements.mainPage) {
+          this.elements.mainPage.style.display = 'block';
+        }
+        
+        this.currentPage = 'main';
+        Logger.debug('Switched to main page');
+        
+        // Reset window to default size
+        this._resetWindowSize();
+        
+      } catch (error) {
+        Logger.error('Failed to show main page', error);
+      }
+    };
+
+    UIManager.prototype._showCritiquePage = function() {
+      try {
+        if (this.elements.mainPage) {
+          this.elements.mainPage.style.display = 'none';
+        }
+        
+        if (this.elements.critiquePage) {
+          this.elements.critiquePage.style.display = 'block';
+        }
+        
+        this.currentPage = 'critique';
+        Logger.debug('Switched to critique page');
+        
+        // Resize window to fit content
+        this._resizeWindowToFitContent();
+        
+      } catch (error) {
+        Logger.error('Failed to show critique page', error);
+      }
+    };
+
+    UIManager.prototype._handleApiRequest = function(message) {
+      try {
+        var requestId = message.requestId;
+        var payload = message.payload;
+        var apiKey = message.apiKey;
+        var timeout = message.timeout || 30000;
+        
+        Logger.debug('Making API request from UI', { requestId: requestId });
+        
+        // Make the API request using fetch (available in UI context)
+        fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey
+          },
+          body: JSON.stringify(payload)
+        }).then(function(response) {
+          if (!response.ok) {
+            return response.text().then(function(errorText) {
+              throw new Error('API request failed: ' + response.status + ' - ' + response.statusText + ' - ' + errorText);
+            });
+          }
+          return response.json();
+        }).then(function(data) {
+          if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+            throw new Error('Invalid response format from OpenAI API');
+          }
+          
+          // Send success response back to plugin
+          parent.postMessage({
+            pluginMessage: {
+              type: 'api-response',
+              requestId: requestId,
+              response: data.choices[0].message.content
+            }
+          }, '*');
+          
+        }).catch(function(error) {
+          // Send error response back to plugin
+          parent.postMessage({
+            pluginMessage: {
+              type: 'api-response',
+              requestId: requestId,
+              error: {
+                message: error.message,
+                code: 'API_REQUEST_FAILED',
+                statusCode: null,
+                response: null
+              }
+            }
+          }, '*');
+        });
+        
+      } catch (error) {
+        Logger.error('Error handling API request', error);
+        // Send error response back to plugin
+        parent.postMessage({
+          pluginMessage: {
+            type: 'api-response',
+            requestId: message.requestId,
+            error: {
+              message: error.message,
+              code: 'NETWORK_ERROR',
+              statusCode: null,
+              response: null
+            }
+          }
+        }, '*');
+      }
+    };
+
+    UIManager.prototype._resizeWindowToFitContent = function() {
+      try {
+        // Send message to plugin to resize window
+        parent.postMessage({
+          pluginMessage: {
+            type: 'resize-window',
+            size: 'auto'
+          }
+        }, '*');
+        
+        Logger.debug('Window resize request sent');
+        
+      } catch (error) {
+        Logger.error('Failed to request window resize', error);
+      }
+    };
+
+    UIManager.prototype._resetWindowSize = function() {
+      try {
+        // Send message to plugin to reset window size
+        parent.postMessage({
+          pluginMessage: {
+            type: 'resize-window',
+            size: 'default'
+          }
+        }, '*');
+        
+        Logger.debug('Window reset request sent');
+        
+      } catch (error) {
+        Logger.error('Failed to request window reset', error);
+      }
+    };
+
+    UIManager.prototype._formatCritiqueResponse = function(critique) {
+      try {
+        if (!critique) {
+          return '<p>No critique available.</p>';
+        }
+        
+        // Split into lines for better processing
+        var lines = critique.split('\n');
+        var formattedLines = [];
+        
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i].trim();
+          
+          if (line === '') {
+            // Empty line - add spacing
+            formattedLines.push('<div style="margin: 1em 0;"></div>');
+          } else if (/^\d+\./.test(line)) {
+            // Numbered section header (e.g., "1. Visual Hierarchy:")
+            var headerText = line.replace(/\*\*/g, '').replace(/\*/g, '');
+            formattedLines.push('<div style="margin: 1.5em 0 0.5em 0; font-weight: bold; font-size: 14px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 0.3em;">' + headerText + '</div>');
+          } else if (/^\s*[•-]/.test(line)) {
+            // Bullet point
+            var bulletText = line.replace(/^\s*[•-]\s*/, '').replace(/\*\*/g, '').replace(/\*/g, '');
+            formattedLines.push('<div style="margin: 0.5em 0 0.5em 1em; padding-left: 1em; position: relative;"><span style="position: absolute; left: 0; color: #667eea; font-weight: bold;">•</span>' + bulletText + '</div>');
+          } else if (line.length > 0) {
+            // Regular text
+            var regularText = line.replace(/\*\*/g, '').replace(/\*/g, '');
+            formattedLines.push('<div style="margin: 0.5em 0; line-height: 1.5;">' + regularText + '</div>');
+          }
+        }
+        
+        return '<div style="font-size: 13px; line-height: 1.6; color: #333;">' + formattedLines.join('') + '</div>';
+        
+      } catch (error) {
+        Logger.error('Error formatting critique response', error);
+        return '<div style="padding: 1em; background: #f8f9fa; border-radius: 8px; white-space: pre-wrap;">' + critique + '</div>';
+      }
+    };
+
+    UIManager.prototype.cleanup = function() {
+      try {
+        // Remove event listeners
+        if (this.elements.apiKeyInput) {
+          this.elements.apiKeyInput.removeEventListener('input', this._handleApiKeyChange);
+        }
+        
+        if (this.elements.getCritiqueBtn) {
+          this.elements.getCritiqueBtn.removeEventListener('click', this._handleGetCritique);
+        }
+        
+        if (this.elements.backBtn) {
+          this.elements.backBtn.removeEventListener('click', this._handleBack);
+        }
+        
+        if (this.elements.newCritiqueBtn) {
+          this.elements.newCritiqueBtn.removeEventListener('click', this._handleBack);
+        }
+        
+        Logger.info('UI Manager cleaned up');
+        
+      } catch (error) {
+        Logger.error('Error during UI Manager cleanup', error);
+      }
+    };
+
+    // Initialize UI when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      var uiManager = new UIManager();
+      
+      try {
+        uiManager.initialize();
+      } catch (error) {
+        console.error('Failed to initialize UI Manager:', error);
+        // Show error in UI if possible
+        if (uiManager && uiManager.showError) {
+          uiManager.showError('Failed to initialize UI: ' + error.message);
+        }
+      }
+    });
+  </script>
+</body>
+</html> 
