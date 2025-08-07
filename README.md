@@ -2,7 +2,6 @@
 
 > Get AI-powered design feedback directly in Figma. Improve your designs with intelligent critiques from OpenAI's GPT-4.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Figma Plugin](https://img.shields.io/badge/Figma-Plugin-00D2FF?logo=figma&logoColor=white)](https://figma.com)
 [![OpenAI](https://img.shields.io/badge/Powered%20by-OpenAI-412991?logo=openai)](https://openai.com)
 
@@ -130,7 +129,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 💬 Support
 
