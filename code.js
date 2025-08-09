@@ -6,12 +6,12 @@
 // Configuration
 var CONFIG = {
   API: {
-    BASE_URL: 'https://api.openai.com/v1',
+    BASE_URL: 'https://figma-design-critique-backend-service-7mrikuqz6.vercel.app', // Update this with your deployed server URL
     MODEL: 'gpt-3.5-turbo',
     MAX_TOKENS: 1000,
     TEMPERATURE: 0.7,
     TIMEOUT: 30000,
-    ENDPOINT: '/chat/completions'
+    ENDPOINT: '/api/critique'
   },
   UI: {
     WIDTH: 400,
@@ -53,39 +53,28 @@ var ERROR_CODES = {
   ANALYSIS_FAILED: 'ANALYSIS_FAILED'
 };
 
-// Logger utility
+// Logger utility - production mode (minimal logging)
 function Logger() {}
-Logger.isDevelopment = true; // Temporarily enabled for debugging
+Logger.isDevelopment = false; // Production mode
 
 Logger.info = function(message, data) {
-  // Only log in development mode
-  if (Logger.isDevelopment) {
-    console.log('[INFO] ' + message);
-  }
+  // No logging in production
 };
 
 Logger.error = function(message, error) {
-  // Always log errors
-  console.error('[ERROR] ' + message);
+  // No logging in production
 };
 
 Logger.debug = function(message, data) {
-  // Only log debug info in development
-  if (Logger.isDevelopment) {
-    console.log('[DEBUG] ' + message);
-  }
+  // No logging in production
 };
 
 Logger.warn = function(message, data) {
-  // Always log warnings
-  console.warn('[WARN] ' + message);
+  // No logging in production
 };
 
 Logger.time = function(label, startTime) {
-  if (Logger.isDevelopment) {
-    var duration = Date.now() - startTime;
-    console.log(label + ' completed in ' + duration + 'ms');
-  }
+  // No logging in production
 };
 
 // Validation utilities
@@ -404,12 +393,11 @@ function ApiClient() {
   this.retryDelay = 1000;
 }
 
-ApiClient.prototype.getDesignCritique = function(designInfo, apiKey, context) {
+ApiClient.prototype.getDesignCritique = function(designInfo, context) {
   context = context || '';
   var startTime = Date.now();
   
   try {
-    Validators.validateApiKey(apiKey);
     Validators.validateDesignInfo(designInfo);
     Validators.validateContext(context);
     
@@ -419,7 +407,7 @@ ApiClient.prototype.getDesignCritique = function(designInfo, apiKey, context) {
     });
     
     var self = this;
-    return this._makeRequest(designInfo, apiKey, context).then(function(response) {
+    return this._makeRequest(designInfo, context).then(function(response) {
       Logger.time('API request', startTime);
       return response;
     });
@@ -430,13 +418,13 @@ ApiClient.prototype.getDesignCritique = function(designInfo, apiKey, context) {
   }
 };
 
-ApiClient.prototype._makeRequest = function(designInfo, apiKey, context) {
+ApiClient.prototype._makeRequest = function(designInfo, context) {
   var self = this;
   var lastError;
   
   return new Promise(function(resolve, reject) {
     function attempt(attemptNumber) {
-      self._performRequest(designInfo, apiKey, context).then(function(response) {
+      self._performRequest(designInfo, context).then(function(response) {
         resolve(response);
       }).catch(function(error) {
         lastError = error;
@@ -466,7 +454,7 @@ ApiClient.prototype._makeRequest = function(designInfo, apiKey, context) {
   });
 };
 
-ApiClient.prototype._performRequest = function(designInfo, apiKey, context) {
+ApiClient.prototype._performRequest = function(designInfo, context) {
   var payload = this._buildPayload(designInfo, context);
   var self = this;
   
@@ -490,7 +478,6 @@ ApiClient.prototype._performRequest = function(designInfo, apiKey, context) {
         type: 'make-api-request',
         requestId: requestId,
         payload: payload,
-        apiKey: apiKey,
         timeout: self.timeout
       });
       
@@ -622,13 +609,8 @@ MessageHandler.prototype._handleGetCritique = function(msg) {
       throw new Error('No design elements selected for critique');
     }
     
-    if (!prompt || !prompt.apiKey) {
-      throw new Error('API key is required');
-    }
-    
     this.apiClient.getDesignCritique(
       designInfo,
-      prompt.apiKey,
       prompt.context || ''
     ).then(function(critique) {
       Logger.info('Critique received', { length: critique.length });
@@ -675,14 +657,7 @@ MessageHandler.prototype._sendMessage = function(type, data) {
     }
     
   } catch (error) {
-    Logger.error('Failed to send message to UI', error);
-    console.error('Message sending error details:', {
-      figma: !!figma,
-      figmaUi: !!(figma && figma.ui),
-      postMessage: !!(figma && figma.ui && typeof figma.ui.postMessage === 'function'),
-      type: type,
-      error: error.message
-    });
+    // Silent fail in production
   }
 };
 
@@ -761,7 +736,8 @@ MessageHandler.prototype._handleResizeWindow = function(msg) {
     if (size === 'auto') {
       // Calculate dynamic size based on content
       // For critique page, make it taller to accommodate more content
-      figma.ui.resize(CONFIG.UI.WIDTH, Math.min(800, window.screen.height * 0.8));
+      var maxHeight = 800; // Safe maximum height for critique content
+      figma.ui.resize(CONFIG.UI.WIDTH, maxHeight);
       Logger.info('Window resized to auto size');
     } else if (size === 'default') {
       // Reset to default size

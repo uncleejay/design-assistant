@@ -330,23 +330,7 @@
         </div>
       </div>
 
-      <div class="section">
-        <h3>
-          <svg class="icon" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
-          API Configuration
-        </h3>
-        <input 
-          type="password" 
-          id="apiKeyInput" 
-          class="api-key-input" 
-          placeholder="Enter your OpenAI API key"
-        >
-        <p style="font-size: 11px; color: #666; margin-top: 8px;">
-          Get your free API key from <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #0066cc; text-decoration: none;">OpenAI Platform</a>.
-        </p>
-      </div>
+      <!-- API Configuration section removed - now using server-side API key -->
 
       <div class="section">
         <h3>
@@ -437,32 +421,24 @@
       }
     };
 
-    // Logger utility
+    // Logger utility - production mode (no logging)
     function Logger() {}
-    Logger.isDevelopment = true; // Temporarily enabled for debugging
+    Logger.isDevelopment = false; // Production mode
 
     Logger.info = function(message, data) {
-      // Only log in development mode
-      if (Logger.isDevelopment) {
-        console.log('[INFO] ' + message);
-      }
+      // No logging in production
     };
 
     Logger.error = function(message, error) {
-      // Always log errors
-      console.error('[ERROR] ' + message);
+      // No logging in production
     };
 
     Logger.debug = function(message, data) {
-      // Only log debug info in development
-      if (Logger.isDevelopment) {
-        console.log('[DEBUG] ' + message);
-      }
+      // No logging in production
     };
 
     Logger.warn = function(message, data) {
-      // Always log warnings
-      console.warn('[WARN] ' + message);
+      // No logging in production
     };
 
     // Secure storage utility
@@ -479,8 +455,7 @@
         Logger.debug('API key stored successfully');
       } catch (error) {
         Logger.error('Failed to store API key', error);
-        // Don't throw error, just log it
-        console.warn('Could not store API key, but continuing...');
+        // Silent fail in production
       }
     };
 
@@ -545,7 +520,6 @@
       this.elements = {
         // Main page elements
         mainPage: document.getElementById('mainPage'),
-        apiKeyInput: document.getElementById('apiKeyInput'),
         contextInput: document.getElementById('contextInput'),
         getCritiqueBtn: document.getElementById('getCritiqueBtn'),
         loading: document.getElementById('loading'),
@@ -569,27 +543,15 @@
     };
 
     UIManager.prototype._loadSavedData = function() {
-      try {
-        var savedApiKey = SecureStorage.getApiKey();
-        if (savedApiKey && this.elements.apiKeyInput) {
-          this.elements.apiKeyInput.value = savedApiKey;
-          Logger.debug('Loaded saved API key');
-        }
-      } catch (error) {
-        Logger.error('Failed to load saved data', error);
-      }
+      // No longer need to load API key since it's server-side
+      Logger.debug('No saved data to load');
     };
 
     UIManager.prototype._setupEventListeners = function() {
       try {
         var self = this;
         
-        // API key input
-        if (this.elements.apiKeyInput) {
-          this.elements.apiKeyInput.addEventListener('input', function() {
-            self._handleApiKeyChange();
-          });
-        }
+        // API key input removed - no longer needed
 
         // Get critique button
         if (this.elements.getCritiqueBtn) {
@@ -673,33 +635,16 @@
       }
     };
 
-    UIManager.prototype._handleApiKeyChange = function() {
-      try {
-        var apiKey = this.elements.apiKeyInput.value;
-        SecureStorage.setApiKey(apiKey);
-        Logger.debug('API key updated');
-      } catch (error) {
-        Logger.error('Failed to save API key', error);
-        // Don't show error to user, just log it
-        console.warn('API key storage failed, but continuing...');
-      }
-    };
+    // API key handling removed - no longer needed
 
     UIManager.prototype._handleGetCritique = function() {
       try {
-        var apiKey = this.elements.apiKeyInput.value.trim();
         var context = this.elements.contextInput.value.trim();
 
         Logger.debug('Get critique request', {
-          hasApiKey: !!apiKey,
           hasContext: !!context,
           hasDesignInfo: !!this.currentDesignInfo
         });
-
-        if (!apiKey) {
-          this.showError('Please enter your OpenAI API key');
-          return;
-        }
 
         if (!this.currentDesignInfo || this.currentDesignInfo.count === 0) {
           this.showError('Please select some design elements first');
@@ -714,7 +659,6 @@
             type: 'get-critique',
             designInfo: this.currentDesignInfo,
             prompt: {
-              apiKey: apiKey,
               context: context
             }
           }
@@ -891,17 +835,15 @@
       try {
         var requestId = message.requestId;
         var payload = message.payload;
-        var apiKey = message.apiKey;
         var timeout = message.timeout || 30000;
         
         Logger.debug('Making API request from UI', { requestId: requestId });
         
-        // Make the API request using fetch (available in UI context)
-        fetch('https://api.openai.com/v1/chat/completions', {
+        // Make the API request to our proxy server
+        fetch('https://figma-design-critique-backend-service-7mrikuqz6.vercel.app/api/critique', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(payload)
         }).then(function(response) {
@@ -912,8 +854,8 @@
           }
           return response.json();
         }).then(function(data) {
-          if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-            throw new Error('Invalid response format from OpenAI API');
+          if (!data.content) {
+            throw new Error('Invalid response format from server');
           }
           
           // Send success response back to plugin
@@ -921,7 +863,7 @@
             pluginMessage: {
               type: 'api-response',
               requestId: requestId,
-              response: data.choices[0].message.content
+              response: data.content
             }
           }, '*');
           
@@ -1034,10 +976,7 @@
 
     UIManager.prototype.cleanup = function() {
       try {
-        // Remove event listeners
-        if (this.elements.apiKeyInput) {
-          this.elements.apiKeyInput.removeEventListener('input', this._handleApiKeyChange);
-        }
+        // API key input removed - no cleanup needed
         
         if (this.elements.getCritiqueBtn) {
           this.elements.getCritiqueBtn.removeEventListener('click', this._handleGetCritique);
@@ -1065,8 +1004,7 @@
       try {
         uiManager.initialize();
       } catch (error) {
-        console.error('Failed to initialize UI Manager:', error);
-        // Show error in UI if possible
+        // Silent fail in production - show error in UI if possible
         if (uiManager && uiManager.showError) {
           uiManager.showError('Failed to initialize UI: ' + error.message);
         }
