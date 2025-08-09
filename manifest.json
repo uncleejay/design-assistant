@@ -1,14 +1,24 @@
 {
   "name": "Design Critique Assistant",
+  "id": "1535226228861513038",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
-  "editorType": ["figma", "dev"],
+  "editorType": [
+    "figma",
+    "dev"
+  ],
   "networkAccess": {
-    "allowedDomains": ["https://api.openai.com"]
+    "allowedDomains": [
+      "https://figma-design-critique-backend-service-7mrikuqz6.vercel.app"
+    ]
   },
-  "permissions": ["currentuser"],
-  "capabilities": ["inspect"],
+  "permissions": [
+    "currentuser"
+  ],
+  "capabilities": [
+    "inspect"
+  ],
   "enableProposedApi": false,
   "enablePrivatePluginApi": false,
   "documentAccess": "dynamic-page"

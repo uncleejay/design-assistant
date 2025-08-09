@@ -19,7 +19,7 @@
 ### Prerequisites
 
 - Figma account (free or paid)
-- OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+- That's it! No API keys or setup required
 
 ### Installation
 
@@ -34,15 +34,14 @@
 
 ### Setup
 
-1. **Get your OpenAI API Key**
-   - Visit [OpenAI API Keys](https://platform.openai.com/api-keys)
-   - Create a new API key
-   - Copy the key (you'll need it in the next step)
+1. **Install the Plugin**
+   - Search for "Design Critique Assistant" in Figma's plugin directory
+   - Click "Install" to add it to your workspace
 
-2. **Configure the Plugin**
+2. **Start Using**
    - Open the plugin in Figma
-   - Enter your OpenAI API key in the configuration field
-   - Your key is stored locally and securely
+   - Select design elements and get instant feedback
+   - No configuration needed - it just works!
 
 ## 🎯 How to Use
 
@@ -55,7 +54,7 @@
    - More context = better, more targeted feedback
 
 3. **Get Your Critique**
-   - Click "Get Design Critique"
+   - Click "Get Design Critique" - no setup required!
    - Receive detailed AI analysis and recommendations
    - Review suggestions for improvements
 
